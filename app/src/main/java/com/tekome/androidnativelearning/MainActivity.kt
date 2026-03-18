@@ -4,14 +4,14 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.tekome.androidnativelearning.navigation.Screen
+import com.tekome.androidnativelearning.ui.HomeScreen
+import com.tekome.androidnativelearning.ui.savedstate.SavedStateDemoScreen
 import com.tekome.androidnativelearning.ui.theme.AndroidNativeLearningTheme
+import com.tekome.androidnativelearning.ui.viewmodel.ViewModelDemoScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -19,29 +19,36 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             AndroidNativeLearningTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                val navController = rememberNavController()
+
+                NavHost(
+                    navController = navController,
+                    startDestination = Screen.Home.route
+                ) {
+                    composable(Screen.Home.route) {
+                        HomeScreen(
+                            onNavigateToViewModel = {
+                                navController.navigate(Screen.ViewModelDemo.route)
+                            },
+                            onNavigateToSavedState = {
+                                navController.navigate(Screen.SavedStateDemo.route)
+                            }
+                        )
+                    }
+
+                    composable(Screen.ViewModelDemo.route) {
+                        ViewModelDemoScreen(
+                            onBack = { navController.popBackStack() }
+                        )
+                    }
+
+                    composable(Screen.SavedStateDemo.route) {
+                        SavedStateDemoScreen(
+                            onBack = { navController.popBackStack() }
+                        )
+                    }
                 }
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    AndroidNativeLearningTheme {
-        Greeting("Android")
     }
 }
